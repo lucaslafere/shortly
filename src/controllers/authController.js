@@ -12,16 +12,17 @@ export async function signUp (req, res) {
         SELECT * FROM users
         WHERE email = $1;
         `, [newUser.email]);
-        console.log(checkExistingUser.password)
-
         if (checkExistingUser.rowCount > 0) return res.status(409).send("Esse email está em uso");
+
         const passwordHash = bcrypt.hashSync(newUser.password, 10);
+
         await connection.query(`
         INSERT INTO users
         (name, email, password)
         VALUES ($1, $2, $3);
         `, [newUser.name, newUser.email, passwordHash]);
-        return res.sendStatus(201);
+
+        return res.status(201).send(checkExistingUser);
     } catch (error) {
         return res.sendStatus(500);
     }
@@ -37,9 +38,17 @@ export async function signIn (req, res) {
         SELECT * FROM users
         WHERE email = $1;
         `, [userLogin.email]);
-        if (checkExistingUser.rowCount === 0) return res.sendStatus(409);
-        const comparePassword = compareSync(userLogin.password, checkExistingUser.password)
-        console.log(checkExistingUser.password);
+        if (checkExistingUser.rowCount === 0) return res.sendStatus(401);
+        const comparePassword = compareSync(userLogin.password, checkExistingUser.password);
+        if (!comparePassword) return res.sendStatus(401);
+        const token = jwt.sign({id: checkExistingUser.id}, process.env.JWT_SECRET);
+        return res.status(200).json({
+            user: {
+                id: checkExistingUser.id,
+                email: checkExistingUser.email
+            },
+            token
+        });
     } catch (error) {
         return res.sendStatus(500); 
     }
