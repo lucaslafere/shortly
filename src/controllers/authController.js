@@ -1,11 +1,11 @@
 import connection from '../db/database.js';
 import jwt from 'jsonwebtoken';
-import vrypt, { compareSync } from 'bcrypt';
+import bcrypt, { compareSync } from 'bcrypt';
 import { signUpSchema, signInSchema } from '../schemas/authSchema.js';
 
 export async function signUp (req, res) {
     const newUser = req.body;  
-    const {error} = signUpSchema.validate(user)
+    const {error} = signUpSchema.validate(newUser)
     if (error) return res.status(422).send(error.message);
     try {
         const checkExistingUser = await connection.query(`
@@ -14,7 +14,6 @@ export async function signUp (req, res) {
         `, [newUser.email]);
         if (checkExistingUser.rowCount > 0) return res.status(409).send("Esse email está em uso");
         const passwordHash = bcrypt.hashSync(newUser.password, 10);
-
         await connection.query(`
         INSERT INTO users
         (name, email, password)
