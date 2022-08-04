@@ -1,7 +1,6 @@
 import express, { json } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
 import authRouter from './routes/authRouter.js';
 import urlsRouter from './routes/urlsRouter.js';
 import rankingRouter from './routes/rankingRouter.js';
