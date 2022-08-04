@@ -39,17 +39,16 @@ export async function signIn (req, res) {
         WHERE email = $1;
         `, [userLogin.email]);
         if (checkExistingUser.rowCount === 0) return res.sendStatus(401);
-        // const comparePassword = compareSync(userLogin.password, checkExistingUser.rows.password);
-        // if (!comparePassword) return res.sendStatus(401);
-        // const token = jwt.sign({id: checkExistingUser.rows.id}, process.env.JWT_SECRET);
-        // return res.status(200).json({
-        //     user: {
-        //         id: checkExistingUser.rows.id,
-        //         email: checkExistingUser.rows.email
-        //     },
-        //     token
-        // });
-        return res.status(200).send(checkExistingUser.rows[0].password);
+        const comparePassword = compareSync(userLogin.password, checkExistingUser.rows[0].password);
+        if (!comparePassword) return res.sendStatus(401);
+        const token = jwt.sign({id: checkExistingUser.rows[0].id}, process.env.JWT_SECRET);
+        return res.status(200).json({
+            user: {
+                id: checkExistingUser.rows[0].id,
+                email: checkExistingUser.rows[0].email
+            },
+            token
+        })
     } catch (error) {
         return res.sendStatus(500); 
     }
