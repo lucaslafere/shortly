@@ -49,7 +49,7 @@ export async function signIn (req, res) {
         //     },
         //     token
         // });
-        return res.status(200).send(checkExistingUser.rows.password);
+        return res.status(200).send(checkExistingUser.rows[0].password);
     } catch (error) {
         return res.sendStatus(500); 
     }
