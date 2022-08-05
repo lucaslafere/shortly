@@ -50,7 +50,25 @@ export async function getUrlById (req, res) {
 }
 
 export async function openUrl (req, res) {
-
+    const {shortUrl} = req.params;
+    try {
+        const checkUrl = await connection.query(`
+        SELECT url, "shortUrls"."visitCount", "shortUrls".id as "shortUrlId"
+        FROM urls
+        JOIN "shortUrls"
+        ON "shortUrls"."urlId" = urls.id
+        WHERE "shortUrls"."identifier" = $1
+        `, [shortUrl]);
+        if (checkUrl.rowCount === 0) return res.sendStatus(404);
+        const updateCount = await connection.query(`
+        UPDATE "shortUrls"
+        SET "visitCount" = $1
+        WHERE id = $2
+        `, [checkUrl.rows[0].visitCount + 1, checkUrl.rows[0].shortUrlId]);
+        return res.sendStatus(200)
+    } catch (error) {
+        return res.sendStatus(500);
+    }
 }
 
 export async function deleteUrl (req, res) {
