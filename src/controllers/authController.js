@@ -27,8 +27,6 @@ export async function signUp (req, res) {
     }
 }
 
-
-// still needs to add token to database
 export async function signIn (req, res) {
     const userLogin = req.body;
     const { error } = signInSchema.validate(userLogin);
