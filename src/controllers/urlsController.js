@@ -51,7 +51,6 @@ export async function getUrlById (req, res) {
 
 export async function openUrl (req, res) {
     const {shortUrl} = req.params;
-    console.log(shortUrl + " rodei a funcao")
     try {
         const checkUrl = await connection.query(`
         SELECT url, "shortUrls"."visitCount", "shortUrls".id as "shortUrlId"
@@ -60,15 +59,15 @@ export async function openUrl (req, res) {
         ON "shortUrls"."urlId" = urls.id
         WHERE "shortUrls"."identifier" = $1
         `, [shortUrl]);
-        if (checkUrl.rowCount > 0) {
-            const updateCount = await connection.query(`
-            UPDATE "shortUrls"
-            SET "visitCount" = $1
-            WHERE id = $2
-            `, [checkUrl.rows[0].visitCount + 1, checkUrl.rows[0].shortUrlId]);
-            return res.redirect(checkUrl.rows[0].url)
-        }
-        return res.sendStatus(404);
+        
+        if (checkUrl.rowCount === 0) return res.sendStatus(404);
+
+        const updateCount = await connection.query(`
+        UPDATE "shortUrls"
+        SET "visitCount" = $1
+        WHERE id = $2
+        `, [checkUrl.rows[0].visitCount + 1, checkUrl.rows[0].shortUrlId]);
+        return res.redirect(checkUrl.rows[0].url);
     } catch (error) {
         return res.sendStatus(500);
     }
