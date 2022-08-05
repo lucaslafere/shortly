@@ -73,5 +73,25 @@ export async function openUrl (req, res) {
 }
 
 export async function deleteUrl (req, res) {
-    
+    const {userId} = res.locals;
+    const shortenedUrlId = req.params.id;
+    try {
+        const checkExistingUrl = await connection.query(`
+        SELECT * FROM "shortUrls"
+        WHERE id = $1
+        `, [shortenedUrlId]);
+        if (checkExistingUrl.rowCount === 0) return res.sendStatus(404);
+        const checkMatchingUser = await connection.query(`
+        SELECT * FROM "shortUrls"
+        WHERE id = $1 AND "userId" = $2
+        `, [shortenedUrlId, userId]);
+        if (checkMatchingUser.rowCount === 0) return res.sendStatus(401);
+        const deleteUrl = await connection.query(`
+        DELETE FROM "shortUrls"
+         WHERE id = $1 AND "userId" = $2
+        `, [shortenedUrlId, userId]);
+        return res.sendStatus(204);
+    } catch (error) {
+        return res.sendStatus(500);
+    }
 }
