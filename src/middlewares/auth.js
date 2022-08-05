@@ -1,6 +1,6 @@
 import connection from "../db/database.js";
 
-const auth = async function (req, res, next) {
+export async function auth (req, res, next) {
     const {authorization} = req.headers;
     const token = authorization?.replace('Bearer ', '');
     try {
@@ -16,5 +16,3 @@ const auth = async function (req, res, next) {
     }
     next();
 };
-
-export default auth;
