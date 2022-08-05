@@ -44,6 +44,11 @@ export async function signIn (req, res) {
         const comparePassword = compareSync(userLogin.password, checkExistingUser.rows[0].password);
         if (!comparePassword) return res.sendStatus(401);
         const token = jwt.sign({id: checkExistingUser.rows[0].id}, process.env.JWT_SECRET);
+        const addToken = await connection.query(`
+        INSERT INTO sessions
+        (token, "userId")
+        VALUES ($1, $2);
+        `, [token, checkExistingUser.rows[0].id]);
         return res.status(200).json({
             user: {
                 id: checkExistingUser.rows[0].id,
