@@ -24,17 +24,29 @@ export async function shortenUrl (req, res) {
         (identifier, "urlId", "userId")
         VALUES ($1, $2, $3);
         `, [shortUrl, urlId.rows[0].id, userId]);
-
-    return res.status(201).json({
-        shortUrl
-    });
+        return res.status(201).json({
+            shortUrl
+        });
     } catch (error) {
         return res.sendStatus(500);
     } 
 }
 
 export async function getUrlById (req, res) {
-
+    const { id } = req.params;
+    try {
+        const selectUrl = await connection.query(`
+        SELECT "shortUrls".id, "shortUrls".identifier as "shortUrl", urls.url
+        FROM "shortUrls"
+        JOIN urls
+        ON "shortUrls"."urlId" = urls.id
+        WHERE "shortUrls".id = $1
+        `, [id]);
+        if (selectUrl.rowCount === 0) return res.sendStatus(404);
+        return res.status(200).json(selectUrl.rows)
+    } catch (error) {
+        return res.sendStatus(500);
+    }
 }
 
 export async function openUrl (req, res) {
