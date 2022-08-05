@@ -1,4 +1,5 @@
 import connection from "../db/database.js";
+import jwt from "jsonwebtoken";
 
 export async function auth (req, res, next) {
     const {authorization} = req.headers;
