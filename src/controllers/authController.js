@@ -21,8 +21,7 @@ export async function signUp (req, res) {
         (name, email, password)
         VALUES ($1, $2, $3);
         `, [newUser.name, newUser.email, passwordHash]);
-
-        return res.status(201).send(checkExistingUser);
+        return res.sendStatus(201)
     } catch (error) {
         return res.sendStatus(500);
     }
