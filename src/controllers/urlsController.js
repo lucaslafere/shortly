@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid';
 export async function shortenUrl (req, res) {
     const {userId} = res.locals;
     const url = req.body;
+    return res.send(userId)
     const { error } = urlValidation.validate(url);
     if (!url || error) return res.status(422).send("Please input a valid url");
     try {
