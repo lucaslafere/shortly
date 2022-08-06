@@ -2,10 +2,6 @@ import connection from "../db/database.js";
 
 export async function getRanking (req, res) {
     try {
-        // const users = await connection.query(`
-        // SELECT users.id, users.name
-        // FROM users;
-        // `);
         const sumVisits = await connection.query(`
         SELECT u.id, u.name, COUNT(s.identifier) as "linksCount", COALESCE(SUM(s."visitCount"),0) as "visitCount"
         FROM users u
