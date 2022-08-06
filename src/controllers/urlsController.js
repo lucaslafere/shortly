@@ -4,27 +4,35 @@ import { nanoid } from 'nanoid';
 
 export async function shortenUrl (req, res) {
     const {userId} = res.locals;
+    console.log("pegou o user id do locals" + userId)
     const url = req.body;
-    return res.sendStatus(userId)
+    console.log("pegou url do body")
     const { error } = urlValidation.validate(url);
+    console.log("validou url com schema")
     if (!url || error) return res.status(422).send("Please input a valid url");
+    console.log("verificou se teve erro e se url é valida")
     try {
         const shortUrl = nanoid();
+        console.log("encurtou url codigo " + shortUrl)
         if (!shortUrl) return res.status(400).send("There was an error shortening this url");
+        console.log("começou primeira query")
         const insertUrl = await connection.query(`
         INSERT INTO urls
         (url, "userId")
         VALUES ($1, $2);
         `, [url.url, userId]);
-        // const urlId = await connection.query(`
-        // SELECT id FROM urls
-        // WHERE url = $1 AND "userId" = $2;
-        // `, [url.url, userId]);
-        // const insertShortUrl = await connection.query(`
-        // INSERT INTO "shortUrls"
-        // (identifier, "urlId", "userId")
-        // VALUES ($1, $2, $3);
-        // `, [shortUrl, urlId.rows[0].id, userId]);
+        console.log("acabou primeira, começou segunda query")
+        const urlId = await connection.query(`
+        SELECT id FROM urls
+        WHERE url = $1 AND "userId" = $2;
+        `, [url.url, userId]);
+        console.log("acabou segunda, começou terceira query")
+        const insertShortUrl = await connection.query(`
+        INSERT INTO "shortUrls"
+        (identifier, "urlId", "userId")
+        VALUES ($1, $2, $3);
+        `, [shortUrl, urlId.rows[0].id, userId]);
+        console.log("acabou terceira query, vai enviar o json")
         return res.status(201).json({
             shortUrl
         });
