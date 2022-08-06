@@ -15,15 +15,15 @@ export async function shortenUrl (req, res) {
         (url, "userId")
         VALUES ($1, $2);
         `, [url.url, userId]);
-        const urlId = await connection.query(`
-        SELECT id FROM urls
-        WHERE url = $1 AND "userId" = $2;
-        `, [url.url, userId]);
-        const insertShortUrl = await connection.query(`
-        INSERT INTO "shortUrls"
-        (identifier, "urlId", "userId")
-        VALUES ($1, $2, $3);
-        `, [shortUrl, urlId.rows[0].id, userId]);
+        // const urlId = await connection.query(`
+        // SELECT id FROM urls
+        // WHERE url = $1 AND "userId" = $2;
+        // `, [url.url, userId]);
+        // const insertShortUrl = await connection.query(`
+        // INSERT INTO "shortUrls"
+        // (identifier, "urlId", "userId")
+        // VALUES ($1, $2, $3);
+        // `, [shortUrl, urlId.rows[0].id, userId]);
         return res.status(201).json({
             shortUrl
         });
