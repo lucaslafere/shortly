@@ -76,7 +76,7 @@ export async function openUrl (req, res) {
         SET "visitCount" = $1
         WHERE id = $2
         `, [checkUrl.rows[0].visitCount + 1, checkUrl.rows[0].shortUrlId]);
-        return res.redirect(checkUrl.rows[0].url);
+        return res.redirect(200, checkUrl.rows[0].url);
     } catch (error) {
         return res.sendStatus(500);
     }
